@@ -69,27 +69,42 @@ def solve(n_points=15, delta_t=0.001, n_steps=50):
     print("Final Temperature Distribution:", values)
     return x, values, time_evolution
 
+delta_t = 0.001
 
-x, temperature, time_evolution = solve(n_points=15, delta_t=0.001, n_steps=100)
+x, temperature, time_evolution = solve(n_points=15, delta_t=delta_t, n_steps=200)
 
-plt.figure(figsize=(8, 5))
-plt.plot(x, temperature, marker='o', label='Temperature Distribution')
-plt.title('Temperature Distribution in a Rod')
-plt.xlabel('Position (x)')
-plt.ylabel('Temperature (T)')
-plt.grid()
-plt.legend()
-plt.show()
 
 # plot the time evolution of the temperature distribution
 plt.figure(figsize=(10, 6))
-cmap = plt.get_cmap('viridis')
+cmap = plt.get_cmap('magma')
 for i, temp in enumerate(time_evolution):
     if i % 10 == 0:  # Plot every 10th time step
-        plt.plot(x, temp, label=f'Time step {i}', color=cmap(i / len(time_evolution)))
+        # compute time
+        time = i * delta_t
+        plt.plot(x, temp, label=f'Time step {time}', color=cmap(i / len(time_evolution)))
 plt.title('Time Evolution of Temperature Distribution')
 plt.xlabel('Position (x)')
 plt.ylabel('Temperature (T)')
 plt.grid()
 plt.legend()
-plt.show()
+plt.savefig("heat_conduction_time_ev.png",dpi=300)
+plt.close()
+
+# For a given x spacing analyse the cfl condition
+n_points = 15
+delta_ts = [0.0001, 0.0005, 0.0007, 0.001, 0.002, 0.0025, 0.0026, 0.0027, 0.0028]
+
+plt.figure(figsize=(10,6))
+for delta_t in delta_ts:
+    x, temperature, time_evolution = solve(n_points=n_points, delta_t=delta_t, n_steps=200)
+    plt.plot(x, temperature, label=f'ratio = {delta_t / ((x[1] - x[0])**2):.4f}, delta_t = {delta_t}')
+plt.title('Final Temperature Distribution for Different Time Steps')
+plt.xlabel('Position (x)')
+plt.ylabel('Temperature (T)')
+plt.grid()
+plt.legend()
+plt.savefig("heat_conduction_final_temp.png",dpi=300)
+plt.close()
+
+
+
